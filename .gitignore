@@ -1,6 +1,7 @@
 # Ambiente virtual
 venv/
 .env/
+.env
 
 # Arquivo de credenciais sensível
 credentials.json

@@ -7,6 +7,7 @@ import datetime
 import os
 import hashlib
 import secrets
+import json
 
 load_dotenv()  # Carrega variáveis do .env
 
@@ -36,8 +37,9 @@ class PlanilhaService:
     def _conectar_google_sheets(self):
         """Conecta ao Google Sheets usando service account."""
         try:
-            creds = service_account.Credentials.from_service_account_file(
-                "credentials.json",
+            creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS_JSON"])
+            creds = service_account.Credentials.from_service_account_info(
+                creds_info,
                 scopes=SCOPES
             )
             return build("sheets", "v4", credentials=creds)
