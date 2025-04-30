@@ -1,0 +1,36 @@
+# Ambiente virtual
+venv/
+.env/
+
+# Arquivo de credenciais sensível
+credentials.json
+
+# __pycache__ e arquivos compilados do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de log
+*.log
+
+# Cache de pacotes
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos do editor
+.vscode/
+*.swp
+.idea/
+
+# Backup
+*.bak
+*.tmp
+
+# Compilação do sistema
+*.egg-info/
+dist/
+build/

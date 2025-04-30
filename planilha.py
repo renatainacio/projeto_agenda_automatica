@@ -1,14 +1,17 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from dotenv import load_dotenv
 import jwt
 import datetime
 import os
 import hashlib
 import secrets
 
+load_dotenv()  # Carrega variáveis do .env
+
 # ID da planilha
-SPREADSHEET_ID = "1cyXrNZ2b1fDiuG7MCOGNYvTjcOrMBee__QZEuO-fyZM"
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1cyXrNZ2b1fDiuG7MCOGNYvTjcOrMBee__QZEuO-fyZM")
 
 # IDs das abas
 SHEET_IDS = {
