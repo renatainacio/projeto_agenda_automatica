@@ -1,19 +1,11 @@
 
 from flask import Flask, request, jsonify
 from api_alunos import AlunoAPI
+from aluno_service import AlunoService
 
 app = Flask(__name__)
 api = AlunoAPI()
-
-@app.route('/registrar', methods=['POST'])
-def registrar_aluno():
-    data = request.get_json()
-    nome = data.get('nome')
-    telefone = data.get('telefone')
-    senha = data.get('senha')
-    resultado = api.criar_aluno(nome, telefone, senha)
-    return jsonify(resultado)
-
+service = AlunoService()
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -21,6 +13,21 @@ def login():
     telefone = data.get('telefone')
     senha = data.get('senha')
     resultado = api.login(telefone, senha)
+    return jsonify(resultado)
+
+@app.route('/cadastro', methods=['POST'])
+def cadastro():
+    data = request.get_json()
+    nome = data.get('nome')
+    telefone = data.get('telefone')
+    senha = data.get('senha')
+    aulas_semana = data.get('aulas_semana')
+    resultado = service.criar_aluno(
+        nome = nome,
+        telefone = telefone,
+        aulas_semana = aulas_semana,
+        senha = senha
+    )
     return jsonify(resultado)
 
 @app.route('/salas', methods=['GET'])
