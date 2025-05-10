@@ -30,9 +30,10 @@ def cadastro():
     )
     return jsonify(resultado)
 
-@app.route('/salas', methods=['GET'])
-def listar_salas():
-    resultado = api.listar_salas()
+
+@app.route('/aulas', methods=['GET'])
+def listar_aulas():
+    resultado = api.listar_aulas()
     return jsonify(resultado)
 
 @app.route('/agendar', methods=['POST'])

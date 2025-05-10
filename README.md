@@ -112,7 +112,7 @@ token = resultado["token"]
 api.agendar_aula(token, "01/01/2024", "10:00", "Sala 1")
 
 # Listar aulas
-aulas = api.listar_aulas(token)
+aulas = api.listar_agendamentos(token)
 
 # Cancelar aula
 api.cancelar_aula(token, "01/01/2024", "10:00", "Sala 1")

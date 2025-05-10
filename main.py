@@ -40,7 +40,7 @@ def main():
         
         # Listar salas disponíveis
         print("\n=== Listando Salas Disponíveis ===")
-        resultado_salas = api.listar_salas()
+        resultado_salas = api.listar_aulas()
         print(f"Salas disponíveis: {resultado_salas}")
         
         if resultado_salas["sucesso"] and resultado_salas["salas"]:
@@ -58,7 +58,7 @@ def main():
             
             # # Exemplo de listagem de aulas
             print("\n=== Testando Listagem de Aulas ===")
-            resultado_listagem = api.listar_aulas(token)
+            resultado_listagem = api.listar_agendamentos(token)
             print(f"Resultado da listagem: {resultado_listagem}")
             
             # Exemplo de cancelamento de aula

@@ -17,18 +17,24 @@ class AlunoAPI:
             return False, "Token inválido ou expirado"
         return True, cpf
 
-    def listar_salas(self):
+    def listar_aulas(self):
         """Lista todas as salas disponíveis."""
         try:
-            salas = self.planilha.ler_dados("Salas!A2:B")
+            aulas = self.planilha.ler_dados("Aulas!A2:H")
             return {
                 "sucesso": True,
-                "salas": [
+                "aulas": [
                     {
-                        "nome": sala[0],
-                        "professor": sala[1]
+                        "id": aula[0],
+                        "data": aula[1],
+                        "horário": aula[2],
+                        "modalidade": aula[3],
+                        "professor": aula[4],
+                        "duracao": aula[5],
+                        "maximo_alunos": aula[6],
+                        "vagas_ocupadas": aula[7]
                     }
-                    for sala in salas
+                    for aula in aulas
                 ]
             }
         except Exception as e:
@@ -115,7 +121,7 @@ class AlunoAPI:
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def listar_aulas(self, token):
+    def listar_agendamentos(self, token):
         """Lista todas as aulas do aluno."""
         sucesso, cpf = self._verificar_autenticacao(token)
         if not sucesso:
