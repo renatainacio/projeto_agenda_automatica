@@ -36,16 +36,37 @@ def listar_aulas():
     resultado = api.listar_aulas()
     return jsonify(resultado)
 
-@app.route('/agendar', methods=['POST'])
+
+def getToken(request):
+    token = request.headers.get("Authorization")
+
+    if token and token.startswith("Bearer "):
+        return token[7:]  # remove "Bearer "
+    return None
+
+
+@app.route('/agendamentos', methods=['POST'])
 def agendar():
     data = request.get_json()
-    token = data.get('token')
-    data_aula = data.get('data')
-    horario = data.get('horario')
-    sala_nome = data.get('sala_nome')
-    resultado = api.agendar_aula(token, data_aula, horario, sala_nome)
+    token = getToken(request)
+
+    id_aula = data.get('id_aula')
+    resultado = api.agendar_aula(token, id_aula)
     return jsonify(resultado)
 
+@app.route('/agendamentos', methods=['GET'])
+def listar_agendamentos():
+    token = getToken(request)
+    resultado = api.listar_agendamentos(token)
+    return jsonify(resultado)
+
+@app.route('/agendamentos/<id_agendamento>', methods=['DELETE'])
+def cancelar_agendamento(id_agendamento):
+    token = getToken(request)
+    resultado = api.cancelar_agendamento(token, id_agendamento)
+    return jsonify(resultado)
+
+    
 if __name__ == '__main__':
     import os
     port = int(os.environ.get("PORT", 5000))

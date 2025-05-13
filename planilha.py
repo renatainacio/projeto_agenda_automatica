@@ -14,12 +14,6 @@ load_dotenv()  # Carrega variáveis do .env
 # ID da planilha
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "1cyXrNZ2b1fDiuG7MCOGNYvTjcOrMBee__QZEuO-fyZM")
 
-# IDs das abas
-SHEET_IDS = {
-    "Alunos": 1480663513,  # ID real da aba Alunos
-    "Aulas": 1266211232    # ID real da aba Aulas
-}
-
 # Escopos necessários
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -32,7 +26,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "sua_chave_secreta_aqui_123456@")
 class PlanilhaService:
     def __init__(self):
         self.service = self._conectar_google_sheets()
-        self.tokens = {}  # Armazena tokens ativos
+        self.sheet_ids = self._obter_sheet_ids() 
 
     def _conectar_google_sheets(self):
         """Conecta ao Google Sheets usando service account."""
@@ -47,23 +41,45 @@ class PlanilhaService:
             print(f"Erro ao conectar: {str(e)}")
             return None
 
-    def _gerar_token(self, telefone):
+    def _obter_sheet_ids(self):
+        try:
+            metadata = self.service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+            sheet_ids = {
+                sheet["properties"]["title"]: sheet["properties"]["sheetId"]
+                for sheet in metadata.get("sheets", [])
+            }
+            return sheet_ids
+        except Exception as e:
+            print(f"Erro ao obter sheet IDs: {e}")
+            return {}
+
+    def _gerar_token(self, telefone, nome):
         """Gera um token JWT para o aluno."""
         payload = {
             'telefone': telefone,
+            'nome': nome,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }
         token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
-        self.tokens[telefone] = token  # Armazena o token
+        self._salvar_token(telefone, token)
         return token
+
+
+    def _buscar_token(self, token):
+        dados = self.ler_dados("Tokens!A:B")
+        for linha in dados[1:]:
+            if len(linha) >= 2 and linha[1] == token:
+                return linha[0]
+        return None
+    
 
     def _verificar_token(self, token):
         """Verifica se o token é válido."""
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-            return payload['telefone']
+            return payload['telefone'], payload['nome']
         except:
-            return None
+            return None, None
 
     def _criptografar_senha(self, senha):
         """Criptografa a senha usando SHA-256 com salt."""
@@ -87,7 +103,7 @@ class PlanilhaService:
                     if not self._verificar_senha(senha, aluno[3]):
                         return {"sucesso": False, "mensagem": "Senha incorreta"}
                     
-                    token = self._gerar_token(telefone)
+                    token = self._gerar_token(telefone, aluno[0])
                     return {
                         "sucesso": True,
                         "token": token,
@@ -135,7 +151,7 @@ class PlanilhaService:
         except HttpError as err:
             return False, f"Erro ao inserir dados: {err}"
 
-    def atualizar_dados(self, range_name, values):
+    def atualizar_dados(self, range_name, values, valueInputOption="RAW"):
         """Atualiza dados em uma planilha."""
         try:
             sheet = self.service.spreadsheets()
@@ -145,7 +161,7 @@ class PlanilhaService:
                 .update(
                     spreadsheetId=SPREADSHEET_ID,
                     range=range_name,
-                    valueInputOption="RAW",
+                    valueInputOption=valueInputOption,
                     body=body
                 )
                 .execute()
@@ -162,7 +178,7 @@ class PlanilhaService:
                 'requests': [{
                     'deleteDimension': {
                         'range': {
-                            'sheetId': SHEET_IDS[sheet_name],
+                            'sheetId': self.sheet_ids[sheet_name],
                             'dimension': 'ROWS',
                             'startIndex': row_index - 1,
                             'endIndex': row_index
@@ -178,9 +194,29 @@ class PlanilhaService:
         except HttpError as err:
             return False, f"Erro ao remover dados: {err}"
 
+    def _salvar_token(self, telefone, token):
+        """Salva ou atualiza um token na aba 'Tokens'."""
+        dados = self.ler_dados("Tokens!A:B")
+
+        # Verifica se o telefone já existe
+        for i, linha in dados[1:]: 
+            if len(linha) >= 2 and linha[0] == telefone:
+                # Atualiza o token na linha correspondente
+                range_update = f"Tokens!B{i}"
+                sucesso, msg = self.atualizar_dados(range_update, [[token]])
+                return sucesso, "Token atualizado" if sucesso else msg
+
+        # Insere nova linha
+        sucesso, msg = self.inserir_dados("Tokens!A2", [[telefone, token]])
+        return sucesso, "Token inserido" if sucesso else msg
+
+
     def verificar_autenticacao(self, token):
         """Verifica se o token é válido e retorna o telefone do aluno."""
-        telefone = self._verificar_token(token)
-        if telefone and telefone in self.tokens and self.tokens[telefone] == token:
-            return telefone
+        telefone, nome = self._verificar_token(token)
+        if telefone and self._buscar_token(token) == telefone:
+            return {
+                    "telefone": telefone, 
+                    "nome": nome
+                }
         return None 
