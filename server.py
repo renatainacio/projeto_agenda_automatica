@@ -1,9 +1,11 @@
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from api_alunos import AlunoAPI
 from aluno_service import AlunoService
 
 app = Flask(__name__)
+CORS(app)
 api = AlunoAPI()
 service = AlunoService()
 

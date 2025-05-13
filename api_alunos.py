@@ -173,6 +173,9 @@ class AlunoAPI:
     def listar_agendamentos(self, token):
         """Lista todas as aulas do aluno."""
         sucesso, user = self._verificar_autenticacao(token)
+        if not sucesso:
+            return {"sucesso": False, "mensagem": user}
+
         telefone = user["telefone"]
         if not sucesso:
             return {"sucesso": False, "mensagem": telefone}
@@ -188,6 +191,7 @@ class AlunoAPI:
                 "aulas": [
                     {
                         "id": aula[0],
+                        "id_aula": aula[3],
                         "data": aula[4],
                         "horario": aula[5],
                         "modalidade": aula[6],
