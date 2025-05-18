@@ -8,7 +8,7 @@ def main():
     print("\n=== Criando Aluno ===")
     resultado_criacao = aluno_service.criar_aluno(
         nome="João Silva",
-        telefone="(11)977884455",
+        cpf="(11)977884455",
         aulas_semana=2,
         senha="senha123"
     )
@@ -27,7 +27,7 @@ def main():
     # Exemplo de edição de aluno
     print("\n=== Editando Aluno ===")
     resultado_edicao = aluno_service.editar_aluno(
-        telefone="(11)977884455",
+        cpf="(11)977884455",
         dados={
             "nome": "João Silva Atualizado",
             "aulas_semana": 3,

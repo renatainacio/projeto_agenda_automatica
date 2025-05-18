@@ -53,15 +53,15 @@ class PlanilhaService:
             print(f"Erro ao obter sheet IDs: {e}")
             return {}
 
-    def _gerar_token(self, telefone, nome):
+    def _gerar_token(self, cpf, nome):
         """Gera um token JWT para o aluno."""
         payload = {
-            'telefone': telefone,
+            'cpf': cpf,
             'nome': nome,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }
         token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
-        self._salvar_token(telefone, token)
+        self._salvar_token(cpf, token)
         return token
 
 
@@ -77,7 +77,7 @@ class PlanilhaService:
         """Verifica se o token é válido."""
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
-            return payload['telefone'], payload['nome']
+            return payload['cpf'], payload['nome']
         except:
             return None, None
 
@@ -93,23 +93,23 @@ class PlanilhaService:
         hash_calculado = hashlib.sha256((senha + salt).encode()).hexdigest()
         return hash_calculado == hash_armazenado
 
-    def autenticar_aluno(self, telefone, senha):
+    def autenticar_aluno(self, cpf, senha):
         """Autentica um aluno e retorna um token."""
         try:
-            # Buscar aluno pelo telefone
+            # Buscar aluno pelo cpf
             alunos = self.ler_dados("Alunos!A2:D")
             for aluno in alunos:
-                if len(aluno) >= 4 and aluno[1] == telefone:
+                if len(aluno) >= 4 and aluno[1] == cpf:
                     if not self._verificar_senha(senha, aluno[3]):
                         return {"sucesso": False, "mensagem": "Senha incorreta"}
                     
-                    token = self._gerar_token(telefone, aluno[0])
+                    token = self._gerar_token(cpf, aluno[0])
                     return {
                         "sucesso": True,
                         "token": token,
                         "aluno": {
                             "nome": aluno[0],
-                            "telefone": aluno[1],
+                            "cpf": aluno[1],
                             "aulas_semana": aluno[2]
                         }
                     }
@@ -194,29 +194,29 @@ class PlanilhaService:
         except HttpError as err:
             return False, f"Erro ao remover dados: {err}"
 
-    def _salvar_token(self, telefone, token):
+    def _salvar_token(self, cpf, token):
         """Salva ou atualiza um token na aba 'Tokens'."""
         dados = self.ler_dados("Tokens!A:B")
 
-        # Verifica se o telefone já existe
+        # Verifica se o cpf já existe
         for i, linha in dados[1:]: 
-            if len(linha) >= 2 and linha[0] == telefone:
+            if len(linha) >= 2 and linha[0] == cpf:
                 # Atualiza o token na linha correspondente
                 range_update = f"Tokens!B{i}"
                 sucesso, msg = self.atualizar_dados(range_update, [[token]])
                 return sucesso, "Token atualizado" if sucesso else msg
 
         # Insere nova linha
-        sucesso, msg = self.inserir_dados("Tokens!A2", [[telefone, token]])
+        sucesso, msg = self.inserir_dados("Tokens!A2", [[cpf, token]])
         return sucesso, "Token inserido" if sucesso else msg
 
 
     def verificar_autenticacao(self, token):
-        """Verifica se o token é válido e retorna o telefone do aluno."""
-        telefone, nome = self._verificar_token(token)
-        if telefone and self._buscar_token(token) == telefone:
+        """Verifica se o token é válido e retorna o cpf do aluno."""
+        cpf, nome = self._verificar_token(token)
+        if cpf and self._buscar_token(token) == cpf:
             return {
-                    "telefone": telefone, 
+                    "cpf": cpf, 
                     "nome": nome
                 }
         return None 

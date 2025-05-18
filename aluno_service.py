@@ -21,7 +21,7 @@ class AlunoService:
                 "alunos": [
                     {
                         "nome": aluno[0],
-                        "telefone": aluno[1],
+                        "cpf": aluno[1],
                         "aulas_semana": aluno[2]
                     }
                     for aluno in alunos
@@ -30,18 +30,18 @@ class AlunoService:
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def buscar_aluno(self, telefone):
-        """Busca um aluno específico pelo telefone."""
+    def buscar_aluno(self, cpf):
+        """Busca um aluno específico pelo cpf."""
         try:
             alunos = self.planilha.ler_dados("Alunos!A2:D")
-            aluno = next((a for a in alunos if a[1] == telefone), None)
+            aluno = next((a for a in alunos if a[1] == cpf), None)
             
             if aluno:
                 return {
                     "sucesso": True,
                     "aluno": {
                         "nome": aluno[0],
-                        "telefone": aluno[1],
+                        "cpf": aluno[1],
                         "aulas_semana": aluno[2]
                     }
                 }
@@ -49,23 +49,23 @@ class AlunoService:
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def criar_aluno(self, nome, telefone, aulas_semana, senha):
+    def criar_aluno(self, nome, cpf, aulas_semana, senha):
         """Cria um novo aluno."""
         try:
             # Validar dados
-            if not nome or not telefone or not aulas_semana or not senha:
+            if not nome or not cpf or not aulas_semana or not senha:
                 return {"sucesso": False, "mensagem": "Todos os campos são obrigatórios"}
 
-            # Verificar se o telefone já existe
+            # Verificar se o cpf já está cadastrado
             alunos = self.planilha.ler_dados("Alunos!A2:D")
-            if any(a[1] == telefone for a in alunos):
-                return {"sucesso": False, "mensagem": "Telefone já cadastrado"}
+            if any(a[1] == cpf for a in alunos):
+                return {"sucesso": False, "mensagem": "CPF já cadastrado"}
 
             # Criptografar senha
             senha_hash = self._criptografar_senha(senha)
 
             # Preparar dados
-            novo_aluno = [[nome, telefone, str(aulas_semana), senha_hash]]
+            novo_aluno = [[nome, cpf, str(aulas_semana), senha_hash]]
             
             # Inserir na planilha
             sucesso, mensagem = self.planilha.inserir_dados("Alunos!A:D", novo_aluno)
@@ -77,7 +77,7 @@ class AlunoService:
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def editar_aluno(self, telefone, dados):
+    def editar_aluno(self, cpf, dados):
         """Edita os dados de um aluno existente."""
         try:
             # Buscar aluno
@@ -85,7 +85,7 @@ class AlunoService:
             aluno_index = None
             
             for i, aluno in enumerate(alunos):
-                if aluno[1] == telefone:
+                if aluno[1] == cpf:
                     aluno_index = i + 2
                     break
 
@@ -95,7 +95,7 @@ class AlunoService:
             # Preparar dados atualizados
             dados_atualizados = [
                 dados.get("nome", alunos[aluno_index-2][0]),
-                dados.get("telefone", alunos[aluno_index-2][1]),
+                dados.get("cpf", alunos[aluno_index-2][1]),
                 dados.get("aulas_semana", alunos[aluno_index-2][2]),
                 alunos[aluno_index-2][3]  # Manter a senha atual
             ]

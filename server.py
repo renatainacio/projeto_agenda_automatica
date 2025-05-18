@@ -12,21 +12,21 @@ service = AlunoService()
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    telefone = data.get('telefone')
+    cpf = data.get('cpf')
     senha = data.get('senha')
-    resultado = api.login(telefone, senha)
+    resultado = api.login(cpf, senha)
     return jsonify(resultado)
 
 @app.route('/cadastro', methods=['POST'])
 def cadastro():
     data = request.get_json()
     nome = data.get('nome')
-    telefone = data.get('telefone')
+    cpf = data.get('cpf')
     senha = data.get('senha')
     aulas_semana = data.get('aulas_semana')
     resultado = service.criar_aluno(
         nome = nome,
-        telefone = telefone,
+        cpf = cpf,
         aulas_semana = aulas_semana,
         senha = senha
     )

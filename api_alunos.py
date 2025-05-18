@@ -7,9 +7,9 @@ class AlunoAPI:
     def __init__(self):
         self.planilha = PlanilhaService()
 
-    def login(self, telefone, senha):
+    def login(self, cpf, senha):
         """Realiza o login do aluno e retorna o token."""
-        return self.planilha.autenticar_aluno(telefone, senha)
+        return self.planilha.autenticar_aluno(cpf, senha)
 
     def _verificar_autenticacao(self, token):
         """Verifica se o token é válido."""
@@ -65,14 +65,14 @@ class AlunoAPI:
             # Verificar se o aluno já tem aulas agendadas para essa aula
             agendamentos = self.planilha.ler_dados("Agendamentos!A2:F")
             if any(
-                a[1] == user["telefone"] and a[3] == aulas_info[0]
+                a[1] == user["cpf"] and a[3] == aulas_info[0]
                 for a in agendamentos
             ):
                 return {"sucesso": False, "mensagem": "Aluno já está inscrito nessa aula"}
             
             # Verificar cadastro aluno
             aluno = self.planilha.ler_dados(f"Alunos!A2:E")
-            aluno_info = next((a for a in aluno if a[1] == user["telefone"]), None)
+            aluno_info = next((a for a in aluno if a[1] == user["cpf"]), None)
             if not aluno_info:
                 return {"sucesso": False, "mensagem": "Aluno não encontrado"}
 
@@ -83,7 +83,7 @@ class AlunoAPI:
 
             agendamentos_semana = [
                 a for a in agendamentos
-                if a[1] == user["telefone"]
+                if a[1] == user["cpf"]
                 and len(a) >= 5
                 and datetime.strptime(a[4], "%d/%m/%Y").isocalendar().week == semana_alvo
             ]
@@ -99,7 +99,7 @@ class AlunoAPI:
             # Inserir aula
             nova_aula = [[
                 str(uuid.uuid4()),
-                user["telefone"], 
+                user["cpf"], 
                 user["nome"],  
                 aulas_info[0],
                 aulas_info[1],
@@ -125,7 +125,7 @@ class AlunoAPI:
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
 
-        cpf = user["telefone"]
+        cpf = user["cpf"]
         if not sucesso:
             return {"sucesso": False, "mensagem": cpf}
 
@@ -176,15 +176,15 @@ class AlunoAPI:
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
 
-        telefone = user["telefone"]
+        cpf = user["cpf"]
         if not sucesso:
-            return {"sucesso": False, "mensagem": telefone}
+            return {"sucesso": False, "mensagem": cpf}
 
         try:
             aulas = self.planilha.ler_dados("Agendamentos!A2:I")
             if not aulas:
                 return {"sucesso": True, "aulas": []}
-            aulas_aluno = [a for a in aulas if a[1] == telefone]
+            aulas_aluno = [a for a in aulas if a[1] == cpf]
             
             return {
                 "sucesso": True,
@@ -227,7 +227,7 @@ class AlunoAPI:
             dados_atualizados = [
                 cpf,
                 dados.get("nome", alunos[aluno_index-2][1]),
-                dados.get("telefone", alunos[aluno_index-2][2]),
+                dados.get("cpf", alunos[aluno_index-2][2]),
                 dados.get("aulas_semana", alunos[aluno_index-2][3]),
                 alunos[aluno_index-2][4]  # Manter a senha atual
             ]

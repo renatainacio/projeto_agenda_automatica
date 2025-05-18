@@ -8,7 +8,7 @@ def main():
     # Exemplo de login
     print("\n=== Testando Login ===")
     print("Tentando login com:")
-    print("Telefone: (11)999999999")
+    print("cpf: (11)999999999")
     print("Senha: senha123")
     
     # # Verificar dados na planilha
@@ -18,7 +18,7 @@ def main():
     # for aluno in alunos:
     #     print(f"CPF: {aluno[0]}")
     #     print(f"Nome: {aluno[1]}")
-    #     print(f"Telefone: {aluno[2]}")
+    #     print(f"cpf: {aluno[2]}")
     #     print(f"Aulas por semana: {aluno[3]}")
     #     print(f"Senha: {aluno[4]}")
     #     print("-" * 30)

@@ -39,8 +39,8 @@ pip install -r requirements.txt
 5. Configure a planilha do Google Sheets:
    - Crie uma nova planilha
    - Crie as seguintes abas:
-     - `Alunos`: Nome, Telefone, Aulas por Semana, Senha
-     - `Aulas`: Telefone, Data, Horário, Sala, Status, Professor
+     - `Alunos`: Nome, CPF, Aulas por Semana, Senha
+     - `Aulas`: CPF, Data, Horário, Sala, Status, Professor
      - `Salas`: Nome da Sala, Professor
    - Compartilhe a planilha com o email da conta de serviço
    - Copie o ID da planilha da URL e atualize no arquivo `planilha.py`
@@ -71,7 +71,7 @@ aluno_service = AlunoService()
 # Criar aluno
 resultado = aluno_service.criar_aluno(
     nome="João Silva",
-    telefone="(11)999999999",
+    cpf="99999999999",
     aulas_semana=2,
     senha="senha123"
 )
@@ -84,7 +84,7 @@ aluno = aluno_service.buscar_aluno("(11)999999999")
 
 # Editar aluno
 aluno_service.editar_aluno(
-    telefone="(11)999999999",
+    cpf="99999999999",
     dados={
         "nome": "Novo Nome",
         "aulas_semana": 3,
@@ -123,7 +123,7 @@ api.cancelar_aula(token, "01/01/2024", "10:00", "Sala 1")
 - Senhas são criptografadas usando SHA-256 com salt
 - Tokens JWT são usados para autenticação
 - Validação de dados em todas as operações
-- Verificação de duplicidade de telefone
+- Verificação de duplicidade de cpf
 - Limite de aulas por semana
 
 ## Contribuição
