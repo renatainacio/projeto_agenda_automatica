@@ -22,7 +22,7 @@ class AlunoService:
                     {
                         "nome": aluno[0],
                         "cpf": aluno[1],
-                        "aulas_semana": aluno[2]
+                        "atendimentos_semana": aluno[2]
                     }
                     for aluno in alunos
                 ]
@@ -42,18 +42,18 @@ class AlunoService:
                     "aluno": {
                         "nome": aluno[0],
                         "cpf": aluno[1],
-                        "aulas_semana": aluno[2]
+                        "atendimentos_semana": aluno[2]
                     }
                 }
             return {"sucesso": False, "mensagem": "Aluno não encontrado"}
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def criar_aluno(self, nome, cpf, aulas_semana, senha):
+    def criar_aluno(self, nome, cpf, atendimentos_semana, senha):
         """Cria um novo aluno."""
         try:
             # Validar dados
-            if not nome or not cpf or not aulas_semana or not senha:
+            if not nome or not cpf or not atendimentos_semana or not senha:
                 return {"sucesso": False, "mensagem": "Todos os campos são obrigatórios"}
 
             # Verificar se o cpf já está cadastrado
@@ -65,7 +65,7 @@ class AlunoService:
             senha_hash = self._criptografar_senha(senha)
 
             # Preparar dados
-            novo_aluno = [[nome, cpf, str(aulas_semana), senha_hash]]
+            novo_aluno = [[nome, cpf, str(atendimentos_semana), senha_hash]]
             
             # Inserir na planilha
             sucesso, mensagem = self.planilha.inserir_dados("Alunos!A:D", novo_aluno)
@@ -96,7 +96,7 @@ class AlunoService:
             dados_atualizados = [
                 dados.get("nome", alunos[aluno_index-2][0]),
                 dados.get("cpf", alunos[aluno_index-2][1]),
-                dados.get("aulas_semana", alunos[aluno_index-2][2]),
+                dados.get("atendimentos_semana", alunos[aluno_index-2][2]),
                 alunos[aluno_index-2][3]  # Manter a senha atual
             ]
 
@@ -117,7 +117,7 @@ class AlunoService:
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def excluir_aluno(self, telefone):
+    def excluir_aluno(self, cpf):
         """Exclui um aluno."""
         try:
             # Buscar aluno
@@ -125,7 +125,7 @@ class AlunoService:
             aluno_index = None
             
             for i, aluno in enumerate(alunos):
-                if aluno[1] == telefone:
+                if aluno[1] == cpf:
                     aluno_index = i + 2
                     break
 

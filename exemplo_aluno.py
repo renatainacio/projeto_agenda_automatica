@@ -8,8 +8,8 @@ def main():
     print("\n=== Criando Aluno ===")
     resultado_criacao = aluno_service.criar_aluno(
         nome="João Silva",
-        cpf="(11)977884455",
-        aulas_semana=2,
+        cpf="99999999999",
+        atendimentos_semana=2,
         senha="senha123"
     )
     print(f"Resultado da criação: {resultado_criacao}")
@@ -21,7 +21,7 @@ def main():
     
     # Exemplo de busca de aluno
     print("\n=== Buscando Aluno ===")
-    resultado_busca = aluno_service.buscar_aluno("(11)977884455")
+    resultado_busca = aluno_service.buscar_aluno("99999999999")
     print(f"Resultado da busca: {resultado_busca}")
     
     # Exemplo de edição de aluno
@@ -30,7 +30,7 @@ def main():
         cpf="(11)977884455",
         dados={
             "nome": "João Silva Atualizado",
-            "aulas_semana": 3,
+            "atendimentos_semana": 3,
             "senha": "nova_senha123"
         }
     )

@@ -110,7 +110,7 @@ class PlanilhaService:
                         "aluno": {
                             "nome": aluno[0],
                             "cpf": aluno[1],
-                            "aulas_semana": aluno[2]
+                            "atendimentos_semana": aluno[2]
                         }
                     }
             return {"sucesso": False, "mensagem": "Aluno não encontrado"}

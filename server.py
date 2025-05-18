@@ -23,19 +23,19 @@ def cadastro():
     nome = data.get('nome')
     cpf = data.get('cpf')
     senha = data.get('senha')
-    aulas_semana = data.get('aulas_semana')
+    atendimentos_semana = data.get('atendimentos_semana')
     resultado = service.criar_aluno(
         nome = nome,
         cpf = cpf,
-        aulas_semana = aulas_semana,
+        atendimentos_semana = atendimentos_semana,
         senha = senha
     )
     return jsonify(resultado)
 
 
-@app.route('/aulas', methods=['GET'])
-def listar_aulas():
-    resultado = api.listar_aulas()
+@app.route('/atendimentos', methods=['GET'])
+def listar_atendimentos():
+    resultado = api.listar_atendimentos()
     return jsonify(resultado)
 
 
@@ -52,8 +52,8 @@ def agendar():
     data = request.get_json()
     token = getToken(request)
 
-    id_aula = data.get('id_aula')
-    resultado = api.agendar_aula(token, id_aula)
+    id_atendimento = data.get('id_atendimento')
+    resultado = api.agendar_atendimento(token, id_atendimento)
     return jsonify(resultado)
 
 @app.route('/agendamentos', methods=['GET'])

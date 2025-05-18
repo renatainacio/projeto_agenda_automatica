@@ -1,6 +1,6 @@
-# Sistema de Agendamento de Aulas de Pilates
+# Sistema de Agendamento de Atendimentos de Fisioterapia
 
-Este sistema permite gerenciar alunos e agendamentos de aulas de pilates usando o Google Sheets como banco de dados.
+Este sistema permite gerenciar alunos e agendamentos de agendamentos de fisioterapia usando o Google Sheets como banco de dados.
 
 ## Requisitos
 
@@ -39,8 +39,8 @@ pip install -r requirements.txt
 5. Configure a planilha do Google Sheets:
    - Crie uma nova planilha
    - Crie as seguintes abas:
-     - `Alunos`: Nome, CPF, Aulas por Semana, Senha
-     - `Aulas`: CPF, Data, Horário, Sala, Status, Professor
+     - `Alunos`: Nome, CPF, Atendimentos por Semana, Senha
+     - `Atendimentos`: CPF, Data, Horário, Sala, Status, Professor
      - `Salas`: Nome da Sala, Professor
    - Compartilhe a planilha com o email da conta de serviço
    - Copie o ID da planilha da URL e atualize no arquivo `planilha.py`
@@ -72,7 +72,7 @@ aluno_service = AlunoService()
 resultado = aluno_service.criar_aluno(
     nome="João Silva",
     cpf="99999999999",
-    aulas_semana=2,
+    atendimentos_semana=2,
     senha="senha123"
 )
 
@@ -87,7 +87,7 @@ aluno_service.editar_aluno(
     cpf="99999999999",
     dados={
         "nome": "Novo Nome",
-        "aulas_semana": 3,
+        "atendimentos_semana": 3,
         "senha": "nova_senha"
     }
 )
@@ -96,7 +96,7 @@ aluno_service.editar_aluno(
 aluno_service.excluir_aluno("(11)999999999")
 ```
 
-### Agendamento de Aulas
+### Agendamento de Atendimentos
 
 ```python
 from api_alunos import AlunoAPI
@@ -108,14 +108,14 @@ api = AlunoAPI()
 resultado = api.login("(11)999999999", "senha123")
 token = resultado["token"]
 
-# Agendar aula
-api.agendar_aula(token, "01/01/2024", "10:00", "Sala 1")
+# Agendar atendimento
+api.agendar_atendimento(token, "01/01/2024", "10:00", "Sala 1")
 
-# Listar aulas
-aulas = api.listar_agendamentos(token)
+# Listar agendamentos
+agendamentos = api.listar_agendamentos(token)
 
-# Cancelar aula
-api.cancelar_aula(token, "01/01/2024", "10:00", "Sala 1")
+# Cancelar agendamento
+api.cancelar_agendamento(token, "01/01/2024", "10:00", "Sala 1")
 ```
 
 ## Segurança
@@ -124,7 +124,7 @@ api.cancelar_aula(token, "01/01/2024", "10:00", "Sala 1")
 - Tokens JWT são usados para autenticação
 - Validação de dados em todas as operações
 - Verificação de duplicidade de cpf
-- Limite de aulas por semana
+- Limite de atendimentos por semana
 
 ## Contribuição
 

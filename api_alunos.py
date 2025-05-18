@@ -18,57 +18,57 @@ class AlunoAPI:
             return False, "Token inválido ou expirado"
         return True, user
 
-    def listar_aulas(self):
-        """Lista todas as salas disponíveis."""
+    def listar_atendimentos(self):
+        """Lista todas os atendimentos disponíveis."""
         try:
-            aulas = self.planilha.ler_dados("Aulas!A2:H")
+            atendimentos = self.planilha.ler_dados("Atendimentos!A2:H")
             return {
                 "sucesso": True,
-                "aulas": [
+                "atendimentos": [
                     {
-                        "id": aula[0],
-                        "data": aula[1],
-                        "horário": aula[2],
-                        "modalidade": aula[3],
-                        "professor": aula[4],
-                        "duracao": aula[5],
-                        "maximo_alunos": aula[6],
-                        "vagas_ocupadas": aula[7]
+                        "id": a[0],
+                        "data": a[1],
+                        "horário": a[2],
+                        "modalidade": a[3],
+                        "professor": a[4],
+                        "duracao": a[5],
+                        "maximo_alunos": a[6],
+                        "vagas_ocupadas": a[7]
                     }
-                    for aula in aulas
+                    for a in atendimentos
                 ]
             }
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
-    def agendar_aula(self, token, id_aula):
-        """Agenda uma nova aula para o aluno."""
+    def agendar_atendimento(self, token, id_atendimento):
+        """Agenda um novo atendimento para o cliente."""
         sucesso, user = self._verificar_autenticacao(token)
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
 
         try:
             # Verificar se a sala existe
-            aulas = self.planilha.ler_dados("Aulas!A2:H")
-            linha_aula = None
-            aulas_info = None
-            for idx, aula in enumerate(aulas, start=2):
-                if aula[0] == id_aula:
-                    aulas_info = aula
-                    linha_aula = idx
+            atendimentos = self.planilha.ler_dados("Atendimentos!A2:H")
+            linha_atendimento = None
+            atendimentos_info = None
+            for idx, atendimento in enumerate(atendimentos, start=2):
+                if atendimento[0] == id_atendimento:
+                    atendimentos_info = atendimento
+                    linha_atendimento = idx
                     break
-            if not aulas_info:
-                return {"sucesso": False, "mensagem": "Sala não encontrada"}
-            if aulas_info[6] <= aulas_info[7]:
-                return {"sucesso": False, "mensagem": "Aula está lotada"}
+            if not atendimentos_info:
+                return {"sucesso": False, "mensagem": "Atendimento não encontrado"}
+            if atendimentos_info[6] <= atendimentos_info[7]:
+                return {"sucesso": False, "mensagem": "Atendimento está lotado"}
 
-            # Verificar se o aluno já tem aulas agendadas para essa aula
+            # Verificar se o cliente já tem agendamento para esse atendimento
             agendamentos = self.planilha.ler_dados("Agendamentos!A2:F")
             if any(
-                a[1] == user["cpf"] and a[3] == aulas_info[0]
+                a[1] == user["cpf"] and a[3] == atendimentos_info[0]
                 for a in agendamentos
             ):
-                return {"sucesso": False, "mensagem": "Aluno já está inscrito nessa aula"}
+                return {"sucesso": False, "mensagem": "Aluno já está agendado nesse atendimento"}
             
             # Verificar cadastro aluno
             aluno = self.planilha.ler_dados(f"Alunos!A2:E")
@@ -76,10 +76,10 @@ class AlunoAPI:
             if not aluno_info:
                 return {"sucesso": False, "mensagem": "Aluno não encontrado"}
 
-            limite_aulas = int(aluno_info[2])
+            limite_atendimentos = int(aluno_info[2])
             
-            # Verificar limite de aulas por semana
-            semana_alvo = datetime.strptime(aulas_info[1], "%d/%m/%Y").isocalendar().week
+            # Verificar limite de atendimentos por semana
+            semana_alvo = datetime.strptime(atendimentos_info[1], "%d/%m/%Y").isocalendar().week
 
             agendamentos_semana = [
                 a for a in agendamentos
@@ -87,40 +87,34 @@ class AlunoAPI:
                 and len(a) >= 5
                 and datetime.strptime(a[4], "%d/%m/%Y").isocalendar().week == semana_alvo
             ]
-            if len(agendamentos_semana) >= limite_aulas:
-                return {"sucesso": False, "mensagem": "Limite de aulas da semana atingido"}
+            if len(agendamentos_semana) >= limite_atendimentos:
+                return {"sucesso": False, "mensagem": "Limite de atendimentos da semana atingido"}
 
-            # Verificar disponibilidade do horário na sala
-            # aulas_horario = [a for a in aulas if a[1] == data and a[2] == horario and a[3] == sala_nome]
-            # if aulas_horario:
-            #     return {"sucesso": False, "mensagem": "Horário já ocupado nesta sala"}
-
-
-            # Inserir aula
-            nova_aula = [[
+            # Inserir atendimento
+            novo_agendamento = [[
                 str(uuid.uuid4()),
                 user["cpf"], 
                 user["nome"],  
-                aulas_info[0],
-                aulas_info[1],
-                aulas_info[2],
-                aulas_info[3],
-                aulas_info[4],
-                aulas_info[5]
+                atendimentos_info[0],
+                atendimentos_info[1],
+                atendimentos_info[2],
+                atendimentos_info[3],
+                atendimentos_info[4],
+                atendimentos_info[5]
             ]]
-            sucesso, mensagem = self.planilha.inserir_dados("Agendamentos!A:I", nova_aula)
+            sucesso, mensagem = self.planilha.inserir_dados("Agendamentos!A:I", novo_agendamento)
             
             if sucesso:
-                atual = int(aulas_info[7]) if len(aulas_info) > 7 and aulas_info[7].isdigit() else 0
-                self.planilha.atualizar_dados(f"Aulas!H{linha_aula}", [[str(atual + 1)]], "USER_ENTERED")
-                return {"sucesso": True, "mensagem": "Aula agendada com sucesso"}
+                atual = int(atendimentos_info[7]) if len(atendimentos_info) > 7 and atendimentos_info[7].isdigit() else 0
+                self.planilha.atualizar_dados(f"Atendimentos!H{linha_atendimento}", [[str(atual + 1)]], "USER_ENTERED")
+                return {"sucesso": True, "mensagem": "Atendimento agendado com sucesso"}
             return {"sucesso": False, "mensagem": mensagem}
 
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
     def cancelar_agendamento(self, token, id_agendamento):
-        """Cancela uma aula agendada."""
+        """Cancela um atendimento agendada."""
         sucesso, user = self._verificar_autenticacao(token)
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
@@ -130,9 +124,9 @@ class AlunoAPI:
             return {"sucesso": False, "mensagem": cpf}
 
         try:
-            # Buscar aula
+            # Buscar atendimento
             agendamentos = self.planilha.ler_dados("Agendamentos!A2:I")
-            aulas = self.planilha.ler_dados("Aulas!A2:H")
+            atendimentos = self.planilha.ler_dados("Atendimentos!A2:H")
 
             # Procura a linha e a info do agendamento com base no ID
             resultado = next(
@@ -148,22 +142,22 @@ class AlunoAPI:
             if agendamento_info[1] != cpf:
                 return {"sucesso": False, "mensagem": "Agendamento não pertence ao aluno logado"}
 
-            # Procura a aula para reduzir o numero de vagas ocupadas
+            # Procura o atendimento para reduzir o numero de vagas ocupadas
 
-            aulas_info = None
-            linha_aula = None
-            for idx, aula in enumerate(aulas, start=2):
-                if aula[0] == agendamento_info[3]:
-                    aulas_info = aula
-                    linha_aula = idx
+            atendimentos_info = None
+            linha_atendimento = None
+            for idx, atendimento in enumerate(atendimentos, start=2):
+                if atendimento[0] == agendamento_info[3]:
+                    atendimentos_info = atendimento
+                    linha_atendimento = idx
                     break
 
-            # Remover aula
+            # Remover atendimento
             sucesso, mensagem = self.planilha.remover_dados("Agendamentos!A:I", linha_agendamento, "Agendamentos")
 
             if sucesso:
-                atual = int(aulas_info[7]) if len(aulas_info) > 7 and aulas_info[7].isdigit() else 1
-                self.planilha.atualizar_dados(f"Aulas!H{linha_aula}", [[str(atual - 1)]], "USER_ENTERED")
+                atual = int(atendimentos_info[7]) if len(atendimentos_info) > 7 and atendimentos_info[7].isdigit() else 1
+                self.planilha.atualizar_dados(f"Atendimentos!H{linha_atendimento}", [[str(atual - 1)]], "USER_ENTERED")
                 return {"sucesso": True, "mensagem": "Agendamento cancelada com sucesso"}
             return {"sucesso": False, "mensagem": mensagem}
 
@@ -171,7 +165,7 @@ class AlunoAPI:
             return {"sucesso": False, "mensagem": str(e)}
 
     def listar_agendamentos(self, token):
-        """Lista todas as aulas do aluno."""
+        """Lista todos os agendamentos do cliente."""
         sucesso, user = self._verificar_autenticacao(token)
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
@@ -181,24 +175,24 @@ class AlunoAPI:
             return {"sucesso": False, "mensagem": cpf}
 
         try:
-            aulas = self.planilha.ler_dados("Agendamentos!A2:I")
-            if not aulas:
-                return {"sucesso": True, "aulas": []}
-            aulas_aluno = [a for a in aulas if a[1] == cpf]
+            agendamentos = self.planilha.ler_dados("Agendamentos!A2:I")
+            if not agendamentos:
+                return {"sucesso": True, "agendamentos": []}
+            agendamentos_aluno = [a for a in agendamentos if a[1] == cpf]
             
             return {
                 "sucesso": True,
-                "aulas": [
+                "agendamentos": [
                     {
-                        "id": aula[0],
-                        "id_aula": aula[3],
-                        "data": aula[4],
-                        "horario": aula[5],
-                        "modalidade": aula[6],
-                        "professor": aula[7],
-                        "duração": aula[8]
+                        "id": agendamento[0],
+                        "id_atendimento": agendamento[3],
+                        "data": agendamento[4],
+                        "horario": agendamento[5],
+                        "modalidade": agendamento[6],
+                        "professor": agendamento[7],
+                        "duração": agendamento[8]
                     }
-                    for aula in aulas_aluno
+                    for agendamento in agendamentos_aluno
                 ]
             }
         except Exception as e:
@@ -228,7 +222,7 @@ class AlunoAPI:
                 cpf,
                 dados.get("nome", alunos[aluno_index-2][1]),
                 dados.get("cpf", alunos[aluno_index-2][2]),
-                dados.get("aulas_semana", alunos[aluno_index-2][3]),
+                dados.get("atendimentos_semana", alunos[aluno_index-2][3]),
                 alunos[aluno_index-2][4]  # Manter a senha atual
             ]
 
