@@ -114,7 +114,7 @@ class AlunoAPI:
             return {"sucesso": False, "mensagem": str(e)}
 
     def cancelar_agendamento(self, token, id_agendamento):
-        """Cancela um atendimento agendada."""
+        """Cancela um atendimento agendado."""
         sucesso, user = self._verificar_autenticacao(token)
         if not sucesso:
             return {"sucesso": False, "mensagem": user}
@@ -124,7 +124,7 @@ class AlunoAPI:
             return {"sucesso": False, "mensagem": cpf}
 
         try:
-            # Buscar atendimento
+            # Buscar agendamento
             agendamentos = self.planilha.ler_dados("Agendamentos!A2:I")
             atendimentos = self.planilha.ler_dados("Atendimentos!A2:H")
 
@@ -135,6 +135,7 @@ class AlunoAPI:
             )
 
             linha_agendamento, agendamento_info = resultado
+            print("Agendamento a ser deletado: {resultado}")
 
             if not linha_agendamento:
                 return {"sucesso": False, "mensagem": "Agendamento não encontrado"}
@@ -143,7 +144,6 @@ class AlunoAPI:
                 return {"sucesso": False, "mensagem": "Agendamento não pertence ao aluno logado"}
 
             # Procura o atendimento para reduzir o numero de vagas ocupadas
-
             atendimentos_info = None
             linha_atendimento = None
             for idx, atendimento in enumerate(atendimentos, start=2):
@@ -151,9 +151,11 @@ class AlunoAPI:
                     atendimentos_info = atendimento
                     linha_atendimento = idx
                     break
+            print("Atendimento para reduzir vagas ocupadas: {linha_atendimento}")
 
-            # Remover atendimento
+            # Remover agendamento
             sucesso, mensagem = self.planilha.remover_dados("Agendamentos!A:I", linha_agendamento, "Agendamentos")
+            print("Sucesso remover agendamento: {sucesso}")
 
             if sucesso:
                 atual = int(atendimentos_info[7]) if len(atendimentos_info) > 7 and atendimentos_info[7].isdigit() else 1

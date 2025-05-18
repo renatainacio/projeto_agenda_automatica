@@ -35,11 +35,6 @@ def main():
         }
     )
     print(f"Resultado da edição: {resultado_edicao}")
-    
-    # # Exemplo de exclusão de aluno
-    # print("\n=== Excluindo Aluno ===")
-    # resultado_exclusao = aluno_service.excluir_aluno("(11)977884455")
-    # print(f"Resultado da exclusão: {resultado_exclusao}")
 
 if __name__ == "__main__":
     main() 
