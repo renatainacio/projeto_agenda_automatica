@@ -30,7 +30,7 @@ class AlunoAPI:
                         "data": a[1],
                         "horário": a[2],
                         "modalidade": a[3],
-                        "professor": a[4],
+                        "fisio": a[4],
                         "duracao": a[5],
                         "maximo_alunos": a[6],
                         "vagas_ocupadas": a[7]
@@ -191,7 +191,7 @@ class AlunoAPI:
                         "data": agendamento[4],
                         "horario": agendamento[5],
                         "modalidade": agendamento[6],
-                        "professor": agendamento[7],
+                        "fisio": agendamento[7],
                         "duração": agendamento[8]
                     }
                     for agendamento in agendamentos_aluno

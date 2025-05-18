@@ -40,8 +40,8 @@ pip install -r requirements.txt
    - Crie uma nova planilha
    - Crie as seguintes abas:
      - `Alunos`: Nome, CPF, Atendimentos por Semana, Senha
-     - `Atendimentos`: CPF, Data, Horário, Sala, Status, Professor
-     - `Salas`: Nome da Sala, Professor
+     - `Atendimentos`: CPF, Data, Horário, Sala, Status, Fisio
+     - `Salas`: Nome da Sala, Fisio
    - Compartilhe a planilha com o email da conta de serviço
    - Copie o ID da planilha da URL e atualize no arquivo `planilha.py`
 
