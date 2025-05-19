@@ -54,7 +54,7 @@ class PlanilhaService:
             return {}
 
     def _gerar_token(self, cpf, nome):
-        """Gera um token JWT para o aluno."""
+        """Gera um token JWT para o cliente."""
         payload = {
             'cpf': cpf,
             'nome': nome,
@@ -93,27 +93,27 @@ class PlanilhaService:
         hash_calculado = hashlib.sha256((senha + salt).encode()).hexdigest()
         return hash_calculado == hash_armazenado
 
-    def autenticar_aluno(self, cpf, senha):
-        """Autentica um aluno e retorna um token."""
+    def autenticar_cliente(self, cpf, senha):
+        """Autentica um cliente e retorna um token."""
         try:
-            # Buscar aluno pelo cpf
-            alunos = self.ler_dados("Alunos!A2:D")
-            for aluno in alunos:
-                if len(aluno) >= 4 and aluno[1] == cpf:
-                    if not self._verificar_senha(senha, aluno[3]):
+            # Buscar cliente pelo cpf
+            clientes = self.ler_dados("Clientes!A2:D")
+            for cliente in clientes:
+                if len(cliente) >= 4 and cliente[1] == cpf:
+                    if not self._verificar_senha(senha, cliente[3]):
                         return {"sucesso": False, "mensagem": "Senha incorreta"}
                     
-                    token = self._gerar_token(cpf, aluno[0])
+                    token = self._gerar_token(cpf, cliente[0])
                     return {
                         "sucesso": True,
                         "token": token,
-                        "aluno": {
-                            "nome": aluno[0],
-                            "cpf": aluno[1],
-                            "atendimentos_semana": aluno[2]
+                        "cliente": {
+                            "nome": cliente[0],
+                            "cpf": cliente[1],
+                            "atendimentos_semana": cliente[2]
                         }
                     }
-            return {"sucesso": False, "mensagem": "Aluno não encontrado"}
+            return {"sucesso": False, "mensagem": "Cliente não encontrado"}
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
@@ -212,7 +212,7 @@ class PlanilhaService:
 
 
     def verificar_autenticacao(self, token):
-        """Verifica se o token é válido e retorna o cpf do aluno."""
+        """Verifica se o token é válido e retorna o cpf do cliente."""
         cpf, nome = self._verificar_token(token)
         if cpf and self._buscar_token(token) == cpf:
             return {

@@ -1,6 +1,6 @@
 # Sistema de Agendamento de Atendimentos de Fisioterapia
 
-Este sistema permite gerenciar alunos e agendamentos de agendamentos de fisioterapia usando o Google Sheets como banco de dados.
+Este sistema permite gerenciar clientes e agendamentos de agendamentos de fisioterapia usando o Google Sheets como banco de dados.
 
 ## Requisitos
 
@@ -39,7 +39,7 @@ pip install -r requirements.txt
 5. Configure a planilha do Google Sheets:
    - Crie uma nova planilha
    - Crie as seguintes abas:
-     - `Alunos`: Nome, CPF, Atendimentos por Semana, Senha
+     - `Clientes`: Nome, CPF, Atendimentos por Semana, Senha
      - `Atendimentos`: CPF, Data, Horário, Sala, Status, Fisio
      - `Salas`: Nome da Sala, Fisio
    - Compartilhe a planilha com o email da conta de serviço
@@ -50,9 +50,9 @@ pip install -r requirements.txt
 ```
 agenda_pilates/
 ├── planilha.py          # Serviço base para interação com o Google Sheets
-├── aluno_service.py     # Serviço para gerenciamento de alunos
-├── api_alunos.py        # API para operações dos alunos
-├── exemplo_aluno.py     # Exemplos de uso do serviço de alunos
+├── service.py     # Serviço para gerenciamento de clientes
+├── api.py        # API para operações dos clientes
+├── exemplo_cliente.py     # Exemplos de uso do serviço de clientes
 ├── requirements.txt     # Dependências do projeto
 ├── credentials.json     # Credenciais do Google (não versionado)
 └── README.md           # Este arquivo
@@ -60,30 +60,30 @@ agenda_pilates/
 
 ## Uso
 
-### Gerenciamento de Alunos
+### Gerenciamento de Clientes
 
 ```python
-from aluno_service import AlunoService
+from service import Service
 
 # Criar instância do serviço
-aluno_service = AlunoService()
+service = Service()
 
-# Criar aluno
-resultado = aluno_service.criar_aluno(
+# Cadastrar cliente
+resultado = service.criar_cliente(
     nome="João Silva",
     cpf="99999999999",
     atendimentos_semana=2,
     senha="senha123"
 )
 
-# Listar alunos
-alunos = aluno_service.listar_alunos()
+# Listar clientes
+clientes = service.listar_clientes()
 
-# Buscar aluno
-aluno = aluno_service.buscar_aluno("(11)999999999")
+# Buscar clientes
+cliente = service.buscar_cliente("99999999999")
 
-# Editar aluno
-aluno_service.editar_aluno(
+# Editar cliente
+service.editar_cliente(
     cpf="99999999999",
     dados={
         "nome": "Novo Nome",
@@ -92,20 +92,20 @@ aluno_service.editar_aluno(
     }
 )
 
-# Excluir aluno
-aluno_service.excluir_aluno("(11)999999999")
+# Excluir cliente
+service.excluir_cliente("99999999999")
 ```
 
 ### Agendamento de Atendimentos
 
 ```python
-from api_alunos import AlunoAPI
+from api import API
 
 # Criar instância da API
-api = AlunoAPI()
+api = API()
 
 # Login
-resultado = api.login("(11)999999999", "senha123")
+resultado = api.login("99999999999", "senha123")
 token = resultado["token"]
 
 # Agendar atendimento

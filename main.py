@@ -1,9 +1,9 @@
-from api_alunos import AlunoAPI
+from api import API
 from planilha import PlanilhaService
 
 def main():
     # Criar instância da API
-    api = AlunoAPI()
+    api = API()
     
     # Exemplo de login
     print("\n=== Testando Login ===")

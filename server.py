@@ -1,13 +1,13 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from api_alunos import AlunoAPI
-from aluno_service import AlunoService
+from api import API
+from service import Service
 
 app = Flask(__name__)
 CORS(app)
-api = AlunoAPI()
-service = AlunoService()
+api = API()
+service = Service()
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -24,7 +24,7 @@ def cadastro():
     cpf = data.get('cpf')
     senha = data.get('senha')
     atendimentos_semana = data.get('atendimentos_semana')
-    resultado = service.criar_aluno(
+    resultado = service.criar_cliente(
         nome = nome,
         cpf = cpf,
         atendimentos_semana = atendimentos_semana,

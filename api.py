@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 import json
 import uuid
 
-class AlunoAPI:
+class API:
     def __init__(self):
         self.planilha = PlanilhaService()
 
     def login(self, cpf, senha):
-        """Realiza o login do aluno e retorna o token."""
-        return self.planilha.autenticar_aluno(cpf, senha)
+        """Realiza o login do cliente e retorna o token."""
+        return self.planilha.autenticar_cliente(cpf, senha)
 
     def _verificar_autenticacao(self, token):
         """Verifica se o token é válido."""
@@ -32,7 +32,7 @@ class AlunoAPI:
                         "modalidade": a[3],
                         "fisio": a[4],
                         "duracao": a[5],
-                        "maximo_alunos": a[6],
+                        "maximo_clientes": a[6],
                         "vagas_ocupadas": a[7]
                     }
                     for a in atendimentos
@@ -68,15 +68,15 @@ class AlunoAPI:
                 a[1] == user["cpf"] and a[3] == atendimentos_info[0]
                 for a in agendamentos
             ):
-                return {"sucesso": False, "mensagem": "Aluno já está agendado nesse atendimento"}
+                return {"sucesso": False, "mensagem": "Cliente já está agendado nesse atendimento"}
             
-            # Verificar cadastro aluno
-            aluno = self.planilha.ler_dados(f"Alunos!A2:E")
-            aluno_info = next((a for a in aluno if a[1] == user["cpf"]), None)
-            if not aluno_info:
-                return {"sucesso": False, "mensagem": "Aluno não encontrado"}
+            # Verificar cadastro cliente
+            clientes = self.planilha.ler_dados(f"Clientes!A2:E")
+            cliente_info = next((a for a in clientes if a[1] == user["cpf"]), None)
+            if not cliente_info:
+                return {"sucesso": False, "mensagem": "Cliente não encontrado"}
 
-            limite_atendimentos = int(aluno_info[2])
+            limite_atendimentos = int(cliente_info[2])
             
             # Verificar limite de atendimentos por semana
             semana_alvo = datetime.strptime(atendimentos_info[1], "%d/%m/%Y").isocalendar().week
@@ -141,7 +141,7 @@ class AlunoAPI:
                 return {"sucesso": False, "mensagem": "Agendamento não encontrado"}
 
             if agendamento_info[1] != cpf:
-                return {"sucesso": False, "mensagem": "Agendamento não pertence ao aluno logado"}
+                return {"sucesso": False, "mensagem": "Agendamento não pertence ao cliente logado"}
 
             # Procura o atendimento para reduzir o numero de vagas ocupadas
             atendimentos_info = None
@@ -180,7 +180,7 @@ class AlunoAPI:
             agendamentos = self.planilha.ler_dados("Agendamentos!A2:I")
             if not agendamentos:
                 return {"sucesso": True, "agendamentos": []}
-            agendamentos_aluno = [a for a in agendamentos if a[1] == cpf]
+            agendamentos_cliente = [a for a in agendamentos if a[1] == cpf]
             
             return {
                 "sucesso": True,
@@ -194,42 +194,42 @@ class AlunoAPI:
                         "fisio": agendamento[7],
                         "duração": agendamento[8]
                     }
-                    for agendamento in agendamentos_aluno
+                    for agendamento in agendamentos_cliente
                 ]
             }
         except Exception as e:
             return {"sucesso": False, "mensagem": str(e)}
 
     def atualizar_perfil(self, token, dados):
-        """Atualiza os dados do perfil do aluno."""
+        """Atualiza os dados do perfil do cliente."""
         sucesso, cpf = self._verificar_autenticacao(token)
         if not sucesso:
             return {"sucesso": False, "mensagem": cpf}
 
         try:
-            # Buscar aluno
-            alunos = self.planilha.ler_dados("Alunos!A2:E")
-            aluno_index = None
+            # Buscar cliente
+            clientes = self.planilha.ler_dados("Clientes!A2:E")
+            cliente_index = None
             
-            for i, aluno in enumerate(alunos):
-                if aluno[0] == cpf:
-                    aluno_index = i + 2
+            for i, cliente in enumerate(clientes):
+                if cliente[0] == cpf:
+                    cliente_index = i + 2
                     break
 
-            if not aluno_index:
-                return {"sucesso": False, "mensagem": "Aluno não encontrado"}
+            if not cliente_index:
+                return {"sucesso": False, "mensagem": "Cliente não encontrado"}
 
             # Atualizar dados
             dados_atualizados = [
                 cpf,
-                dados.get("nome", alunos[aluno_index-2][1]),
-                dados.get("cpf", alunos[aluno_index-2][2]),
-                dados.get("atendimentos_semana", alunos[aluno_index-2][3]),
-                alunos[aluno_index-2][4]  # Manter a senha atual
+                dados.get("nome", clientes[cliente_index-2][1]),
+                dados.get("cpf", clientes[cliente_index-2][2]),
+                dados.get("atendimentos_semana", clientes[cliente_index-2][3]),
+                clientes[cliente_index-2][4]  # Manter a senha atual
             ]
 
             sucesso, mensagem = self.planilha.atualizar_dados(
-                f"Alunos!A{aluno_index}:E{aluno_index}",
+                f"Clientes!A{cliente_index}:E{cliente_index}",
                 [dados_atualizados]
             )
             
