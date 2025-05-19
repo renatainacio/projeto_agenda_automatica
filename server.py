@@ -5,7 +5,11 @@ from api import API
 from service import Service
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:3000", 
+    "https://agendafisio.vercel.app",
+    "https://agenda-pilates.vercel.app"
+    ])
 api = API()
 service = Service()
 
